@@ -1,0 +1,59 @@
+*{box-sizing:border-box}
+body{margin:0;background:#050505;color:#eee;font-family:"Courier New",monospace;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+button{font-family:inherit}
+#wrap{position:relative;width:100%;max-width:1280px;margin:0 auto}
+#game{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#000}
+#cv{width:100%;height:100%;display:block;image-rendering:pixelated}
+#hud{display:none;position:absolute;top:1.5%;left:1.5%;z-index:4;font-size:clamp(9px,1.8vw,15px);background:#000b;padding:2px 6px;border:1px solid #a22;color:#fc6}
+#hint{display:none;position:absolute;top:1.5%;right:9%;font-size:clamp(9px,1.8vw,15px);background:#000b;padding:2px 6px;border:1px solid #6c6;color:#9f9}
+#sndBtn{display:none;position:absolute;top:1.5%;right:6%;z-index:4;background:#000b;color:#fc6;border:1px solid #a22;font-size:clamp(12px,2vw,18px);padding:0 8px;cursor:pointer}
+#menuBtn{display:none;position:absolute;top:1.5%;right:1.5%;z-index:4;background:#000b;color:#fc6;border:1px solid #a22;font-size:clamp(12px,2vw,18px);padding:0 8px;cursor:pointer}
+#card{display:none;position:absolute;inset:0;background:#000;align-items:center;justify-content:center;text-align:center;flex-direction:column;padding:6%}
+#card.on{display:flex}
+#card h1{color:#e33;font-size:clamp(16px,3.4vw,30px);margin:0 0 10px;letter-spacing:2px}
+#card p{color:#ccc;font-size:clamp(11px,2vw,18px);margin:0}
+#dlg{backdrop-filter:blur(3px);display:none;position:absolute;left:1.5%;right:1.5%;bottom:2%;min-height:0;background:#080810ee;border:2px solid #c22;padding:10px 14px;font-size:clamp(13px,2.1vw,20px);z-index:5}
+#dlg.on{display:block}
+#dlg.pt{padding-left:124px}
+#pcv{display:none;position:absolute;left:10px;top:10px;width:96px;height:96px;image-rendering:pixelated;border:2px solid #c22;background:#000}
+#dlg.pt #pcv{display:block}
+#name{color:#f55;font-weight:bold;margin-bottom:4px;min-height:1em}
+#text{white-space:pre-wrap;line-height:1.35;min-height:2.7em}
+#text.gl{animation:jit .12s infinite;color:#f88}
+#nxt{position:absolute;right:12px;bottom:4px;color:#f55;animation:bl 1s infinite}
+@keyframes bl{50%{opacity:0}}
+@keyframes jit{0%{transform:translate(0,0)}50%{transform:translate(1px,-1px)}100%{transform:translate(-1px,1px)}}
+#choices{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.btn,#choices button{background:#1a0c10;color:#fdd;border:1px solid #c22;padding:8px 10px;font-size:inherit;text-align:left;cursor:pointer}
+.btn:hover,#choices button:hover{background:#4a1018}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+@media (max-aspect-ratio:1/1){#dlg{position:relative;left:auto;right:auto;bottom:auto;margin:8px;min-height:150px}}
+#panel,#menu{display:none;position:fixed;inset:0;background:#05050af5;overflow:auto;padding:14px;z-index:20}
+#menu{z-index:30}
+#panel.on,#menu.on{display:block}
+.box{max-width:600px;margin:0 auto}
+.box h1{color:#e33;text-align:center;font-size:clamp(20px,5vw,34px);margin:8px 0 2px}
+.box h2{color:#f66;margin:6px 0}
+.box p{line-height:1.4;font-size:14px}
+.sub{text-align:center;color:#999;margin-bottom:14px}
+.col{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.st{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px}
+.st span{width:130px}.st i{flex:1;height:10px;background:#222;border:1px solid #600;display:block}.st b{display:block;height:100%}.st em{width:30px;text-align:right;font-style:normal}
+.acts .btn small{display:block;color:#aaa;font-size:11px}
+#fb{color:#fc6;min-height:2.6em}
+.ok{color:#6f6}.no{color:#f66}
+#touch{display:none;position:fixed;left:0;right:0;bottom:14px;z-index:15;pointer-events:none}
+#touch .pad{position:absolute;left:14px;bottom:0;display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:4px;pointer-events:auto}
+#touch button{background:#000a;color:#fff;border:1px solid #c22;font-size:20px;border-radius:8px}
+#touch .a{position:absolute;right:18px;bottom:20px;width:76px;height:76px;border-radius:50%;pointer-events:auto;font-size:22px}
+
+#panel{background:#05050acc}
+#panel.tt{background:linear-gradient(transparent 20%,#000d);display:none;align-items:flex-end;justify-content:center}
+#panel.tt.on{display:flex}
+#panel.tt .box{width:100%;max-width:520px;margin-bottom:4vh}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+.btn.sm{padding:4px 10px}.btn.sel{background:#6a1420;border-color:#fc6}
+#oVol{width:120px}
+#card h1{text-shadow:0 0 18px #f22}
+
+#choices.row{flex-direction:row;flex-wrap:wrap}#choices.row button{flex:1;min-width:120px;text-align:center}
