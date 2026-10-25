@@ -140,10 +140,10 @@ function bindOpts(root,redo){
   root.querySelector('#oVol').oninput=e=>AUDIO.setVol(e.target.value/100);
 }
 function updSnd(){$('sndBtn').textContent=AUDIO.on?'🔊':'🔇'}
-function toTitle(){
+function toTitle(){$('panel').style.background='';
   mode='title';view='bg';bgName='title';queue=[];done=null;PORT.k=null;hideDlg();$('card').classList.remove('on');showHud(false);$('touch').style.display='none';$('hint').style.display='none';AUDIO.setMood('title');
   const p=$('panel');p.className='on tt';const e=endings(),has=!!localStorage.getItem(SAVE_KEY);
-  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.7</div>'+
+  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.8</div>'+
   '<div class="col"><button class="btn" id="bNew">▶ Novo Jogo</button><button class="btn" id="bCont"'+(has?'':' disabled')+'>Continuar</button><button class="btn" id="bOpt">Opções (qualidade e som)</button><button class="btn" id="bInfo">Como trocar as imagens</button></div>'+
   '<p class="sub">Finais encontrados: '+e.length+'/4'+(e.includes('true')?' • ✦ Final verdadeiro desbloqueado':'')+'</p></div>';
   $('bNew').onclick=()=>{AUDIO.resume();p.className='';G=fresh();startGame()};
@@ -543,7 +543,7 @@ const ENDS={
 };
 function showEnding(id){
   const e=ENDS[id],ls=endings();if(!ls.includes(id)){ls.push(id);try{localStorage.setItem(ENDS_KEY,JSON.stringify(ls))}catch(x){}}
-  hideDlg();mode='end';showHud(false);const p=$('panel');p.classList.add('on');
+  hideDlg();mode='end';showHud(false);const p=$('panel');p.classList.add('on');p.style.background="linear-gradient(rgba(5,5,10,.5),rgba(5,5,10,.82)),url('assets/endings/"+id+".png') center/cover no-repeat,#05050a";
   p.innerHTML='<div class="box"><div class="sub">FINAL '+(['true','empire','exile','ash'].indexOf(id)+1)+' / 4</div><h1>'+e.n+'</h1><p style="text-align:center">'+e.t+'</p><p class="sub">Influência '+clamp(G.infl,0,100)+'% • DUPE nv.'+G.dupe+' • ZEE '+G.zee+' • Vínculo '+G.love+' • Fragmentos '+G.frag+'/5</p><p class="sub">Finais desbloqueados: '+ls.length+'/4</p><div class="col"><button class="btn" id="eBack">Voltar ao menu principal</button></div></div>';
   $('eBack').onclick=toTitle;
 }
@@ -816,6 +816,8 @@ S.sx_caderno=[
  Mil("Que tipo de gente mede temperatura e reza ao mesmo tempo?"),
  Nar("Na última página, em tinta nova: “Para o neto do Dr. Antunes, caso ele venha: não pegue o que brilhar.”"),
  Mil("..."),
+ Nar("Entre as páginas, uma fotografia antiga, de bordas gastas: um homem de terno e gravata vinho, de pé diante de um prédio com a sigla ETSC, Entendimento de Tecnologia e Saúde Continental. No verso, a letra do avô: “Antunes, ETSC, 2003. Quando eu ainda achava que o conhecimento bastava.”"),
+ Mil("Ele era formado em filosofia. Doutor em Schopenhauer. Ateu convicto. E passou a vida inteira cuidando de uma coisa que parecia religião.","thinking"),
  Nar("O Menino do Milho fecha o caderno devagar. É a letra do avô: o “g” com o rabinho torto, o mesmo das cartas de aniversário."),
  {fn:sinal},Nar("[Pista da Seita 2/6 — Caderno de cultivo]")
 ];
@@ -853,7 +855,7 @@ S.sx_grav=[
 S.sx_doc=[
  Nar("Uma pasta de papelão amarelada, aberta numa estante. Dentro, duas versões de um mesmo relatório."),
  Nar("Versão A, 1971, tinta azul: “A seita foi dissolvida. Os últimos Guardiões morreram durante a perseguição.”"),
- Nar("Versão B, 2031, papel timbrado do Instituto de Qinghe: “Convênio 07 — calibração do núcleo DUPE com os registros do Primeiro Campo.” Assinatura ilegível. Carimbo oficial."),
+ Nar("Versão B, 2031, papel timbrado do Instituto de Qinghe, com a chancela da ETSC: “Convênio 07 — calibração do núcleo DUPE com os registros do Primeiro Campo.” Assinatura ilegível. Carimbo oficial."),
  Mil("Alguém mentiu em uma das duas. Ou nas duas.","thinking"),
  Nar("O DUPE não nasceu do nada. Alguém leu aquelas páginas antes de construí-lo. E essa pessoa tinha carimbo oficial."),
  {fn:sinal},Nar("[Pista da Seita 5/6 — Documentos conflitantes]")
