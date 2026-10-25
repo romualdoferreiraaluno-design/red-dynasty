@@ -23,6 +23,8 @@ const AUDIO=(()=>{
     templo:{scale:'dark',root:36,bpm:44,pad:1,lead:0,perc:1,ambience:'hum'},
     arquivo:{scale:'sad',root:43,bpm:50,pad:1,lead:1,perc:0,ambience:'dust'},
     porto_noite:{scale:'dark',root:43,bpm:58,pad:1,lead:1,perc:0,ambience:'rain'},
+    praca:{scale:'calm',root:48,bpm:92,pad:1,lead:1,perc:2,ambience:'dust'},
+    varanda:{scale:'sad',root:45,bpm:52,pad:1,lead:1,perc:0,ambience:'rain'},
     black:{scale:'dark',root:40,bpm:50,pad:1,lead:0,perc:0,ambience:null}
   };
   let mood=null,nextT=0,step=0,sched=null,ambNode=null,ambKind=null;

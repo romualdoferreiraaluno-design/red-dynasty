@@ -15,7 +15,7 @@ const ACT=(()=>{
   };
   const IM={};
   const loadI=(k,p)=>{const key=p+'.'+k;if(IM[key]!==undefined)return IM[key];IM[key]=null;const im=new Image();im.onload=()=>{IM[key]=im};im.onerror=()=>{IM[key]=false};im.src='assets/'+(p==='p'?'portraits/':'sprites/')+k+'.png';return null};
-  ['novico','iniciado','guardiao','mestre','anciao'].forEach(n=>{DEF['seita_'+n]=Object.assign({},DEF.seita,{n:({novico:'Noviço',iniciado:'Iniciado',guardiao:'Guardião',mestre:'Mestre',anciao:'Ancião'})[n]})});
+  ['novico','iniciado','guardiao','mestre','anciao'].forEach(n=>{DEF['seita_'+n]=Object.assign({},DEF.seita,{n:({novico:'Semeador',iniciado:'Guardião',guardiao:'Intérprete',mestre:'Jardineiro',anciao:'Cultivador-Mor'})[n]})});
   Object.keys(DEF).forEach(k=>{loadI(k,'p');loadI(k,'s');['neutral','angry','smile','sad','surprised'].forEach(e=>loadI(k+'_'+e,'p'));for(let i=0;i<6;i++)loadI(k+'_w'+i,'s')});['tigre','tigre_w0','tigre_w1','tigre_w2','tigre_int','tigre_atk','tigre_bite','tigre_roar'].forEach(k=>loadI(k,'s'));loadI('tigre','p');
 
   const L=48,buf=mk(L,L),b=buf.getContext('2d');b.imageSmoothingEnabled=false;

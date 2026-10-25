@@ -13,7 +13,7 @@ const CH=ACT.DEF;
 let PORT={k:null,expr:'neutral'},dtS=.016;
 
 /* ---------- ESTADO ---------- */
-const fresh=()=>({love:0,mao:3,unrest:2,research:0,frag:0,flags:{},dupe:1,zee:0,money:150,infl:0,scene:'intro',found:{},seita:{sinais:0,grao:0,contam:0,aliado:0,calma:0}});
+const fresh=()=>({love:0,mao:3,unrest:2,research:0,frag:0,flags:{},dupe:1,zee:0,money:150,infl:0,scene:'intro',found:{},speech:{apoio:2,verdade:5,medo:0},speechOn:false,seita:{sinais:0,grao:0,contam:0,aliado:0,calma:0}});
 let G=fresh();
 let mode='title',view='bg',bgName='black',queue=[],done=null,typing=null,typeFull=null,waiting=null,shake=0,glitchT=0,T=0,cardTok=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -103,7 +103,7 @@ document.querySelectorAll('#touch [data-k]').forEach(b=>{
 $('tA').addEventListener('click',e=>{e.stopPropagation();advance()});
 
 /* ---------- HUD / MENU ---------- */
-function updHud(){$('hud').textContent='♥'+G.love+'  毛'+G.mao+'  ⚠'+G.unrest+'  ⚗'+G.research+'  ¥'+G.money}
+function updHud(){$('hud').textContent='♥'+G.love+'  毛'+G.mao+'  ⚠'+G.unrest+'  ⚗'+G.research+'  ¥'+G.money+(G.speechOn?'  👥'+G.speech.apoio:'')}
 function showHud(v){$('hud').style.display=v?'block':'none';$('menuBtn').style.display=v?'block':'none';$('sndBtn').style.display=v?'block':'none'}
 const bar=(l,v,max,col)=>'<div class="st"><span>'+l+'</span><i><b style="width:'+(v/max*100)+'%;background:'+col+'"></b></i><em>'+v+'</em></div>';
 const canTrue=()=>G.love>=5&&G.mao>=5&&G.frag>=3&&G.research>=4&&G.unrest<=6;
@@ -143,7 +143,7 @@ function updSnd(){$('sndBtn').textContent=AUDIO.on?'🔊':'🔇'}
 function toTitle(){
   mode='title';view='bg';bgName='title';queue=[];done=null;PORT.k=null;hideDlg();$('card').classList.remove('on');showHud(false);$('touch').style.display='none';$('hint').style.display='none';AUDIO.setMood('title');
   const p=$('panel');p.className='on tt';const e=endings(),has=!!localStorage.getItem(SAVE_KEY);
-  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.4</div>'+
+  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.6</div>'+
   '<div class="col"><button class="btn" id="bNew">▶ Novo Jogo</button><button class="btn" id="bCont"'+(has?'':' disabled')+'>Continuar</button><button class="btn" id="bOpt">Opções (qualidade e som)</button><button class="btn" id="bInfo">Como trocar as imagens</button></div>'+
   '<p class="sub">Finais encontrados: '+e.length+'/4'+(e.includes('true')?' • ✦ Final verdadeiro desbloqueado':'')+'</p></div>';
   $('bNew').onclick=()=>{AUDIO.resume();p.className='';G=fresh();startGame()};
@@ -601,7 +601,7 @@ S.cap2=[
  {bg:'city'},
  Nar('O primeiro complexo volta a funcionar. As ações sobem. Mao Ernani anuncia as Zonas Econômicas Especiais: capital, tecnologia e mão de obra num só lugar.'),
  Mao('Cada ZEE será uma pequena China dentro da China. E depois, uma pequena China dentro do mundo.'),
- {mode:'manage',turns:3,then:'cap2b',title:'ZEE — A grande expansão'}
+ {mode:'manage',turns:3,then:'sp0',title:'ZEE — A grande expansão'}
 ];
 S.cap2b=[
  {bg:'office'},
@@ -685,7 +685,7 @@ S.cap3b=[
  Lob('Eu... não contei isso a ninguém.'),
  Nar('Naquela noite, Lobão acorda de um pesadelo com o nome de uma cidade que nunca visitou escrito no próprio caderno. A letra é a dele.'),
  Nar('A investigação deixou de ser apenas política.'),
- {go:'cap4'}
+ {go:'lb0'}
 ];
 
 /* ---------- ATO II ---------- */
@@ -756,7 +756,7 @@ S.cap5=[
  Xx('Quando o Núcleo estiver pronto, ele vai nos observar. Quanto mais forte você sentir, mais ele aprende.'),
  Ern('Aprende o quê?'),
  Xx('Como controlar pessoas. A partir de quem elas amam.'),
- {go:'sx0'}
+ {go:'rom1'}
 ];
 
 S.cap6=[
@@ -814,9 +814,9 @@ S.sx_caderno=[
  Nar("Metade são medições de umidade e temperatura, em colunas perfeitas. A outra metade são orações. As duas letras são da mesma mão."),
  Nar("Uma frase sublinhada duas vezes: “O Grão não distingue uma lembrança verdadeira de uma reconstrução convincente.”"),
  Mil("Que tipo de gente mede temperatura e reza ao mesmo tempo?"),
- Nar("Na última página, em tinta nova: “Para o neto de L., caso ele venha: não pegue o que brilhar.”"),
+ Nar("Na última página, em tinta nova: “Para o neto do Dr. Antunes, caso ele venha: não pegue o que brilhar.”"),
  Mil("..."),
- Nar("O Menino do Milho fecha o caderno devagar. Ninguém, nunca, chamou o avô dele só pela inicial."),
+ Nar("O Menino do Milho fecha o caderno devagar. É a letra do avô: o “g” com o rabinho torto, o mesmo das cartas de aniversário."),
  {fn:sinal},Nar("[Pista da Seita 2/6 — Caderno de cultivo]")
 ];
 S.sx_selo=[
@@ -859,10 +859,10 @@ S.sx_doc=[
  {fn:sinal},Nar("[Pista da Seita 5/6 — Documentos conflitantes]")
 ];
 S.sx_mask=[
- Nar("Uma prateleira de máscaras rígidas de madeira clara, cada uma com um número na testa. Faltam duas. Em uma das vagas, uma etiqueta com uma só letra: “L.”"),
+ Nar("Uma prateleira de máscaras rígidas de madeira clara, cada uma com um número na testa. Faltam duas. Em uma das vagas, uma etiqueta escrita à mão: “Dr. Antunes”"),
  Nar("Dentro de uma das máscaras, um papel dobrado: uma lista de nomes riscados à mão. Entre eles, nomes que Mao citou em discursos como “mártires da modernização”."),
  Mil("Eles não são só fanáticos de roupão. Eles estiveram infiltrados em tudo."),
- Nar("O Tigre fareja a vaga de “L.” por muito tempo. Depois deita-se diante dela, como num velório."),
+ Nar("O Tigre fareja a vaga do “Dr. Antunes” por muito tempo. Depois deita-se diante dela, como num velório."),
  {fn:sinal},Nar("[Pista da Seita 6/6 — Máscaras]")
 ];
 const TAKE={t:"Pegar o Grão.",fx:()=>{G.seita.grao=1;G.seita.contam++;add("research",1);G.unrest=clamp(G.unrest+1,0,10)},do:[
@@ -882,15 +882,15 @@ const LEAVE={t:"Deixar o Grão e pedir os arquivos.",fx:()=>{G.seita.aliado=1;G.
 S.sx_altar=[
  {bg:"templo"},
  Nar("O altar. No topo, sobre um disco de pedra gravado com três anéis, um grão do tamanho de um dedo, dourado, com uma luz interna que pulsa devagar, como se respirasse."),
- Nar("O Tigre passa na frente do Menino do Milho. Senta-se diante do altar, de costas para ele, e fica ali. Como quem espera alguém."),
+ Nar("O Tigre passa na frente do Menino do Milho. Senta-se diante do altar, de costas para ele, e fica ali. Como quem espera alguém. Não há nada sobrenatural nisso. Ele simplesmente espera."),
  Mil("Regra um: nunca pegar um Grão perto de uma estrutura circular."),
  Mil("Isso aqui é inteiro circular."),
  {glitch:30},
  Sei("Ele disse que viria alguém. Esperávamos que fosse mais tarde.","neutral"),
  Nar("Uma figura de capuz escuro, que ninguém ouviu entrar, está de pé entre duas colunas. Não ergue as mãos. Não ameaça."),
- Sei("Você é o neto do Velho L. Tem o mesmo jeito de falar sozinho."),
+ Sei("Você é o neto do Dr. Antunes. Tem o mesmo jeito de falar sozinho."),
  Mil("Você conheceu meu avô?"),
- Sei("Conheci. Ele foi o último que acreditou que o Grão podia ser apenas guardado. Eu ainda tento."),
+ Sei("Conheci. Ele foi o último que acreditou que o Grão podia ser apenas guardado. Preservar algo é deixá-lo existir sem exigir que seja seu. Possuir é a outra coisa. Eu ainda tento a primeira."),
  Mil("E você é de qual lado dessa seita? Do tipo que reza ou do tipo que quebra coisas?"),
  Sei("Do tipo que ainda não decidiu. Somos muitos e não nos entendemos. Alguns querem guardar o Grão. Alguns querem usá-lo. E alguns... querem usar vocês."),
  {q:"O Guardião estende a mão para o altar, sem tocá-lo.",ch:[
@@ -918,6 +918,153 @@ S.sx_out=[
   else:[Nar("Preso na coleira do Tigre, um tubo de couro com cópias de tudo. Ele caminha com a dignidade de quem sabe o valor do que carrega.")]},
  {t:()=>"[Pistas da Seita: "+G.seita.sinais+"/6]"},
  {go:"cap6"}
+];
+
+/* NOVOS CAPÍTULOS */
+/* ===== DISCURSO NA PRAÇA DO POVO (Mao Ernani) ===== */
+const spk=(a,v,m)=>()=>{const s=G.speech;s.apoio=clamp(s.apoio+(a||0),0,14);s.verdade=clamp(s.verdade+(v||0),0,10);s.medo=clamp(s.medo+(m||0),0,10);ART.setCrowd(s.apoio/12);updHud()};
+S.sp0=[
+ {title:"CAPÍTULO 2½ — A PRAÇA DO POVO",sub:"Interlúdio • Você controla Mao Ernani"},
+ {bg:"praca"},
+ {fn:()=>{G.speechOn=true;G.speech={apoio:2,verdade:5,medo:0};ART.setCrowd(.2);updHud()}},
+ Nar("Praça do Povo, Xangai. Trezentas mil pessoas e três mil câmeras. O Programa de Ascensão ganhou as fábricas. Falta ganhar o país."),
+ Nar("Nos bastidores, a água de um copo plástico treme em círculos concêntricos. Não é o palco. São as mãos."),
+ Ern("Cinco minutos. O texto está no teleprompter.","neutral"),
+ Mao("Você leu?","sad"),
+ Ern("Duas vezes. É bom. Tem tudo que a imprensa quer ouvir."),
+ Mao("E o que o povo quer ouvir?"),
+ Ern("Isso não está no papel. Você não precisa ser um monumento, Mao. Só precisa ser verdadeiro."),
+ Mao("Verdade não tem peso de bandeira, Ernani. Uma bandeira se segura. A verdade escorre entre os dedos."),
+ Nar("Mao respira fundo, ajeita a gola e sobe os degraus. O som da multidão chega como uma onda batendo num casco."),
+ Nar("[Cada fala muda o Apoio Popular (👥 no topo), a confiança no que você diz, e o que o país vai sentir amanhã. Não existe resposta perfeita.]"),
+ {q:"ABERTURA. Como Mao começa?",ch:[
+   {t:"Evocar Xangai, 1937: a cidade que se levantou das cinzas.",fx:spk(2,0,0),do:[Mao("Há mais de cem anos, esta cidade ardeu. Dizem que um tigre fugiu de um zoológico em chamas e atravessou ruas em ruínas, e que as pessoas, em vez de caçá-lo, o seguiram."),Nar("Uma onda de aplausos. Alguns, na primeira fila, choram. Mao percebe, assustado, que falou de verdade sem planejar.")]},
+   {t:"Falar de números: empregos, produção, crescimento.",fx:spk(1,1,0),do:[Mao("Quatro milhões de empregos. Doze complexos industriais reativados. Uma economia que, em um ano, voltou a crescer."),Nar("Aplausos educados. Os números são bons. Ninguém na praça os sente.")]},
+   {t:"Prometer que ninguém vai perder nada.",fx:()=>{spk(3,-2,0)();G.flags.mentiu=(G.flags.mentiu||0)+1},do:[Mao("Nenhuma família ficará para trás. Nenhum trabalhador perderá a casa, o salário ou a esperança."),Nar("O som é enorme. É o aplauso mais fácil que Mao já ouviu. Nos bastidores, Ernani fecha os olhos: ele sabe o que os relatórios dizem.")]}]},
+ {q:"O DUPE E AS ZONAS ECONÔMICAS. O que Mao promete?",ch:[
+   {t:"“O DUPE será de todos: parte do lucro volta para as cidades.”",fx:()=>{spk(1,1,0)();G.money=Math.max(0,G.money-20);G.unrest=clamp(G.unrest-1,0,10)},do:[Mao("Cada ZEE vai devolver uma fatia do que produz: escola, hospital, transporte. Isso está no decreto, e vou assinar aqui, diante de vocês."),Nar("Ernani, nos bastidores, abre uma planilha com o rosto de quem está calculando um rombo. E sorri.")]},
+   {t:"“Ordem primeiro. O Estado dirige, o povo acompanha.”",fx:spk(-1,0,2),do:[Mao("A estabilidade vem antes da opinião. Quem dirige um navio em tempestade não consulta os passageiros."),Nar("O aplauso vem de uma parte da praça. A outra parte fica em silêncio, com os braços cruzados.")]},
+   {t:"“Haverá anos difíceis. Peço três anos de paciência.”",fx:spk(1,2,0),do:[Mao("Vou ser direto: os próximos três anos serão duros. Não vou lhes vender conforto que não tenho. Eu peço paciência, e prometo contas abertas."),Nar("Silêncio. Depois, de algum lugar do meio da multidão, alguém começa a bater palmas lentamente, e outros seguem.")]}]},
+ {fn:()=>ART.setCrowd(G.speech.apoio/12)},
+ Nar("Um telão dá zoom numa mulher no meio da multidão. Quarenta e poucos anos, uniforme azul de fábrica ainda no corpo. Segura um cartaz escrito à mão. A segurança já se move na direção dela."),
+ Nar("[Sra. Wen, operária de Dongguan]"),
+ Mao("...Deixem ela falar.","neutral"),
+ Nar("A voz dela chega pelos alto-falantes da imprensa, tremida, sem microfone próprio."),
+ Nar("“Eu faço catorze horas por dia. Meu filho tosse desde que a fábrica abriu. O senhor já respirou o ar de lá, presidente?”"),
+ {q:"RESPOSTA À SRA. WEN.",ch:[
+   {t:"Descer do palanque e responder olhando nos olhos dela.",fx:()=>{spk(3,2,0)();G.unrest=clamp(G.unrest-1,0,10)},do:[Nar("A segurança abre caminho. Mao desce três degraus, depois mais três. A multidão se afasta como água."),Mao("Não, senhora. Eu nunca respirei. Vou respirar. Amanhã de manhã, com a senhora, sem aviso e sem equipe."),Nar("A mulher não aplaude. Apenas confirma com a cabeça, devagar. Para quem observa, vale mais que qualquer ovação.")]},
+   {t:"Mandar a segurança afastá-la e seguir o discurso.",fx:()=>{spk(-3,-2,2)();G.unrest=clamp(G.unrest+1,0,10);G.flags.silenciou=1},do:[Nar("Dois seguranças a tiram de lá em segundos. O telão corta. A praça inteira viu o corte."),Ern("Isso vai render manchete por uma semana.","sad"),Mao("Eu sei.")]},
+   {t:"Prometer uma inspeção pública das fábricas em trinta dias.",fx:()=>{spk(2,1,0)();G.money=Math.max(0,G.money-30);G.flags.inspecao=1},do:[Mao("Em trinta dias, qualquer cidadão poderá acompanhar uma inspeção de ar, água e jornada em Dongguan. Câmeras abertas. Se eu mentir, vocês saberão."),Nar("A praça aplaude, mais pelo risco que Mao acabou de assumir do que pela promessa. Ernani anota o prazo com cara de quem acaba de ganhar um segundo emprego.")]}]},
+ Ern("(no fone) Mao, você ainda tem o papel na frente. Não precisa ler.","neutral"),
+ {q:"O PAPEL. O texto oficial exalta a vitória. O que Mao faz?",ch:[
+   {t:"Ler o texto preparado até o fim.",fx:spk(0,0,1),do:[Mao("Companheiros: nossa pátria, unida, avança rumo a uma nova era..."),Nar("O discurso é bom, é limpo, e em dois minutos todos já pararam de ouvir.")]},
+   {t:"Amassar o papel e dizer o que ele realmente teme.",fx:()=>{const ok=G.speech.verdade>=5;spk(ok?3:0,2,0)();G.flags.vulnerab=1},do:[Nar("Mao dobra o papel ao meio e o põe de lado."),Mao("Eu tenho medo. Todo dia. De errar por vocês. De acertar contra vocês. De deixar alguém para trás e só descobrir quando já for tarde demais."),{if:()=>G.speech.verdade>=5,then:[Nar("Silêncio. Não de espanto: de reconhecimento. Trezentas mil pessoas, inteiras, respirando juntas.")],else:[Nar("A praça fica quieta. Mas é a quietude de quem ouviu uma confissão e não sabe se deve acreditar nela. Ainda há contas abertas entre Mao e o povo.")]}]},
+   {t:"Apelar ao orgulho: “Ninguém mais vai nos dar ordens.”",fx:spk(2,0,1),do:[Mao("A China não pedirá licença para existir. Não mais."),Nar("O som é físico: vibra no peito. É o tipo de aplauso que vira política, para o bem ou para o mal.")]}]},
+ {q:"FECHAMENTO. Como Mao encerra?",ch:[
+   {t:"“Ninguém caminhará sozinho neste país.”",fx:spk(2,0,0),do:[Mao("Se este país vai subir, vai subir inteiro. Ninguém caminhará sozinho.")]},
+   {t:"“Quem não acompanhar, ficará para trás.”",fx:spk(1,0,1),do:[Mao("O futuro não espera. Quem não acompanhar, ficará para trás."),Nar("A frase é forte, e boa para manchete. Em casa, muita gente a ouve como um aviso.")]},
+   {t:"Ficar em silêncio por dez segundos e dizer apenas: “Obrigado.”",fx:spk(2,1,0),do:[Nar("Dez segundos é muito tempo diante de trezentas mil pessoas. Ninguém se mexe."),Mao("Obrigado."),Nar("O aplauso começa pequeno, perto do palco, e vai crescendo, por conta própria, até a última fileira.")]}]},
+ {fn:()=>ART.setCrowd(G.speech.apoio/12)},
+ {if:()=>G.speech.apoio>=10,then:[
+    Nar("RESULTADO — OVAÇÃO."),
+    Nar("Fogos sobem sobre o Bund. As ações sobem junto. As pesquisas da noite apontam o maior índice de aprovação em uma década."),
+    {fn:()=>{G.unrest=clamp(G.unrest-2,0,10);G.money+=60;add("mao",1);G.flags.discurso="ovacao"}},
+    Nar("[Pressão social −2 • ¥ +60 • Confiança de Mao +1]")],
+  else:[{if:()=>G.speech.apoio>=6,then:[
+    Nar("RESULTADO — ACEITO."),
+    Nar("Não é uma vitória, e não é uma derrota. Na manhã seguinte, metade dos jornais fala em “esperança cautelosa”."),
+    {fn:()=>{G.unrest=clamp(G.unrest-1,0,10);G.money+=20;G.flags.discurso="aceito"}},
+    Nar("[Pressão social −1 • ¥ +20]")],
+  else:[{if:()=>G.speech.apoio>=3,then:[
+    Nar("RESULTADO — FRIO."),
+    Nar("Os aplausos foram protocolares. Nas redes, o discurso é comentado em frases curtas, e nenhuma é gentil."),
+    {fn:()=>{G.unrest=clamp(G.unrest+1,0,10);G.flags.discurso="frio"}},
+    Nar("[Pressão social +1]")],
+  else:[
+    Nar("RESULTADO — TUMULTO."),
+    Nar("Vaias na terceira fileira, empurrões, cartazes rasgados. A polícia fecha as saídas. A imagem da praça cheia de tensão dá volta ao mundo."),
+    {fn:()=>{G.unrest=clamp(G.unrest+2,0,10);G.money=Math.max(0,G.money-30);add("mao",-1);G.flags.discurso="tumulto"}},
+    Nar("[Pressão social +2 • ¥ −30 • Confiança de Mao −1]")]}]}]},
+ {if:()=>(G.flags.mentiu||0)>0,then:[Ern("Você prometeu que ninguém perderia nada. Eu tenho os relatórios, Mao. Isso é uma dívida, e vai ser cobrada.","sad")],else:[]},
+ {if:()=>G.flags.inspecao,then:[Mao("Trinta dias, Ernani. Preciso de você em Dongguan.","neutral"),Ern("Eu já marquei na agenda. Em vermelho.")],else:[]},
+ Nar("Nos bastidores, quando as câmeras apagam, Mao deixa o copo cair. A água se espalha pelo chão. Ele fica olhando como quem acabou de atravessar um rio a pé."),
+ Mao("Eu não sei se aquilo foi liderar ou apenas sobreviver.","sad"),
+ Ern("As duas coisas costumam parecer iguais vistas de perto."),
+ {fn:()=>{G.speechOn=false;updHud()}},
+ {go:"cap2b"}
+];
+
+/* ===== PROTOCOLO LOBÃO ===== */
+S.lb0=[
+ {title:"CAPÍTULO 3½ — O PROTOCOLO LOBÃO",sub:"Interlúdio • Você controla Lobão"},
+ {bg:"lab"},
+ Nar("Três da manhã. O laboratório não dorme, mas ninguém mais está acordado. Só Lobão, o zumbido dos refrigeradores e uma xícara de café que nunca foi esvaziada."),
+ Nar("Jin, o estagiário, adormeceu sobre o teclado. Na tela dele: três pastas, três projetos com prazo, orçamento e um carimbo vermelho de PRIORIDADE NACIONAL."),
+ Lob("Três descobertas. Cada uma tem um jeito certo e um jeito rápido. E eu sei exatamente qual deles o país quer.","sad"),
+ Nar("[Cada experimento tem uma escolha de método. Mais rápido rende mais, mas pode custar caro. Para quem?]"),
+ Nar("EXPERIMENTO 1 — FITA SUPERCONDUTORA FS-1\nUma fita capaz de transportar energia sem perdas. Se funcionar, o custo de trens e fábricas cai pela metade."),
+ {q:"Como Lobão conduz o resfriamento?",ch:[
+   {t:"Protocolo completo: 11 dias, todos os testes.",fx:()=>{add("research",1);G.money=Math.max(0,G.money-30);G.flags.etica=(G.flags.etica||0)+1},do:[Nar("Onze dias depois, a fita aguenta a carga projetada com folga. O relatório sai com quarenta páginas e zero ressalvas."),Lob("Lenta. Chata. Correta. Do jeito que eu gosto.")]},
+   {t:"Acelerar: pular o ciclo de resfriamento lento.",fx:()=>{add("research",2);G.money=Math.max(0,G.money-10);if(Math.random()<.4){G.unrest=clamp(G.unrest+1,0,10);G.money=Math.max(0,G.money-40);G.flags.acidenteFS=1}},do:[Nar("Quatro dias depois, a fita funciona. Quase sempre."),{if:()=>G.flags.acidenteFS,then:[Nar("Na demonstração, um trecho da fita se parte e solta um arco que queima o braço de Jin. Não é grave. A bandagem dele ficará, por semanas, como lembrete."),Lob("Foi culpa minha. Eu pulei a etapa. Eu sabia.","sad"),Nar("[Pressão social +1 • ¥ −40 pelo acidente]")],else:[Nar("Nenhum incidente. Lobão sente alívio e culpa na mesma proporção, e percebe que é o alívio que o preocupa.")]}]}]},
+ Nar("EXPERIMENTO 2 — MILHO-7\nUm milho híbrido, resistente à seca. Uma província no interior enfrenta fome. Falta uma etapa: testar em campo, com gente por perto."),
+ {q:"Qual o método do teste de campo?",ch:[
+   {t:"Teste com consentimento, comitê de ética e acompanhamento médico.",fx:()=>{add("research",1);G.money=Math.max(0,G.money-25);G.flags.etica=(G.flags.etica||0)+1},do:[Nar("O comitê exige seis semanas e uma reunião pública na vila. Alguns moradores recusam, outros aceitam. O dado sai menos limpo, mais honesto."),Lob("É mais lento. Mas ninguém vai jantar meu experimento sem saber.")]},
+   {t:"Distribuir o milho na vila sem avisar. É mais rápido e gera contratos.",fx:()=>{add("research",2);G.money+=40;G.unrest=clamp(G.unrest-1,0,10);G.flags.etica=(G.flags.etica||0)-2;G.flags.milho7=1;if(Math.random()<.5){G.flags.intoxic=1;G.unrest=clamp(G.unrest+3,0,10);add("mao",-1)}},do:[Nar("O primeiro lote chega à vila numa terça. Na semana seguinte, os relatórios dizem que a colheita dobrou."),{if:()=>G.flags.intoxic,then:[Nar("Dez dias depois, trinta e duas pessoas dão entrada em um hospital da província com reação alérgica. Ninguém morreu. Ninguém tinha sido avisado."),Lob("Eu sabia que podia acontecer. Eu fingi que a probabilidade era um número.","sad"),Nar("[Pressão social +3 • Confiança de Mao −1]")],else:[Nar("Nenhuma reação grave. A vila celebra. Ninguém ali sabe do que participou. E Lobão guarda, em uma pasta sem nome, a lista dos que comeram."),Lob("Deu certo. Isso não torna certo.")]}]},
+   {t:"Arquivar o projeto até existir um método seguro.",fx:()=>{G.unrest=clamp(G.unrest+1,0,10);G.flags.etica=(G.flags.etica||0)+1},do:[Nar("A fome em Henan continua. Os agricultores recebem apenas ajuda convencional. Lobão não consegue dormir por duas noites, e não sabe qual das duas decisões seria pior."),Nar("[Pressão social +1]")]}]},
+ Nar("EXPERIMENTO 3 — NÚCLEO 02\nO servidor guarda um pacote de dados criptografado, anexado ao projeto do segundo reator. A origem aponta para Qinghe. O nome do arquivo é “inventário de perdas”."),
+ Lob("Esse arquivo não deveria existir. Nem a cidade. Nem eu aqui, mexendo nisso.","sad"),
+ {q:"O que Lobão faz com os dados de Qinghe?",ch:[
+   {t:"Usá-los: calibrar o Núcleo 02 com eles.",fx:()=>{add("research",2);G.frag=Math.min(5,G.frag+1);G.flags.nucleoQ=1;G.flags.etica=(G.flags.etica||0)-1},do:[{glitch:50},Nar("Os números entram no modelo. O Núcleo estabiliza em minutos, como se tivesse esperado por eles. Na tela, uma lista: nomes, idades, endereços. Dentre eles, uma menina de oito anos, filha de um colega, que Lobão levava à escola."),Lob("Eu lembrei o nome dela. Letícia. Letícia, o triciclo azul.","sad"),Nar("[Fragmento +1 • Pesquisa +2. O Núcleo 02 agora “conhece” Qinghe.]")]},
+   {t:"Isolar o pacote e levar a Mao e Ernani.",fx:()=>{add("mao",1);G.flags.etica=(G.flags.etica||0)+1;G.flags.nucleoQ=0},do:[Nar("Lobão copia o arquivo em um dispositivo físico, apaga o rastro do servidor e atravessa a madrugada com ele no bolso, como quem carrega uma pedra."),Lob("Não sei se é prova, herança ou ameaça. Mas isto não é meu para usar."),Nar("[Confiança de Mao +1]")]},
+   {t:"Apagar tudo. Algumas coisas não deviam ser lembradas.",fx:()=>{G.flags.etica=(G.flags.etica||0)+0;G.flags.apagou=1},do:[Nar("Um comando. Um clique. Quando a barra de progresso termina, a tela fica limpa e muito silenciosa."),Lob("Se alguém perguntar, eu nunca vi isso. Se alguém perguntar a mim mesmo, eu também não vi.","sad")]}]},
+ Nar("Jin acorda, desorientado, com a marca do teclado no rosto."),
+ Nar("“Doutor, isso aí... deu certo?”"),
+ Lob("Deu um resultado, Jin. É diferente.","neutral"),
+ {t:()=>"[Pesquisa atual: "+G.research+" • Ética do laboratório: "+((G.flags.etica||0)>=2?"sólida":(G.flags.etica||0)>=0?"discutível":"comprometida")+"]"},
+ {go:"cap4"}
+];
+
+/* ===== AMOR PROIBIDO: A VARANDA ===== */
+S.rom1=[
+ {bg:"varanda"},
+ Nar("Apartamento de Ernani, sábado, 23h40. Pela primeira vez em onze dias, ele chegou em casa antes da meia-noite."),
+ Nar("A xícara de chá na mesinha esfriou faz tempo. Ele não bebeu. Ele deixou esfriar, o que, vindo dele, já virou piada interna de um só lado."),
+ Ern("(Isso é ridículo. Você tem quarenta anos.)","sad"),
+ Nar("O celular está virado para baixo. Ernani já o virou para cima oito vezes desde as dez. Ele contou. Ele conta tudo: é o trabalho dele."),
+ Ern("(Última mensagem: 3h07 da manhã. “Isso é uma promessa ou uma ameaça?” Eu respondi em quarenta segundos. Ele respondeu em onze. Onze segundos é muito rápido para quem não se importa. Ou é só quem digita rápido.)"),
+ Ern("(Ele me deu chá do jeito exato que eu gosto. Disse que leu minha ficha. Demorou um segundo para responder. Um segundo é uma mentira ou é só um segundo?)"),
+ Nar("Ernani pega o tablet. Abre uma planilha em branco. Duas colunas: A FAVOR. CONTRA."),
+ Nar("Na coluna A FAVOR: o chá, o bilhete no livro, “você sempre volta”, o desenho das duas xícaras, a chuva da estação, ele ter escolhido não atirar. Na coluna CONTRA ele escreve uma só linha, e é a que pesa mais:"),
+ Nar("“Ele disse que me procurou primeiro. Procurar é método. Método não é afeto.”"),
+ Ern("(Eu sou um funcionário do Estado. Ele é o homem que o Estado chama de terrorista. Se alguém abrir esse celular, é prisão para mim. Se o Mao abrir, é pior.)"),
+ Ern("(E, mesmo assim, eu estou aqui, olhando uma planilha como se uma soma de células pudesse me dizer o que ele sente.)","sad"),
+ Nar("Ele fecha o tablet. Não consegue comer. Percebe que ainda está com o crachá no pescoço. Tira, e o pendura no encosto da cadeira, devagar, como se fosse o único gesto sob seu controle."),
+ Nar("Vai até a varanda. A chuva fina cai de lado. Lá embaixo, os carros fazem riscos vermelhos e brancos no asfalto molhado."),
+ {glitch:14},
+ Nar("Então um vento sobe pela fachada, e junto vem um cheiro."),
+ Nar("Chá de jasmim. E, por baixo, uma nota seca de solvente, como mãos que lavaram o laboratório com álcool horas antes."),
+ Ern("..."),
+ Nar("Ernani sente o corpo reconhecer antes da cabeça. A garganta fecha. O coração faz uma conta que a planilha não sabe fazer."),
+ Ern("(Não pode ser. Eu estou no vigésimo sétimo andar.)"),
+ Ern("(Posso estar inventando. Eu inventaria. Estou cansado e quero tanto que seja verdade que meu nariz já fabricou o resto.)","sad"),
+ Nar("Ele se debruça no guarda-corpo. Na rua, sob um poste, uma figura de casaco escuro, de pé, imóvel, com o rosto virado para cima. Um carro passa. A luz varre a calçada."),
+ Nar("Quando o carro vai embora, a calçada está vazia."),
+ Ern("(Era ele? Ou era só um homem esperando ônibus?)"),
+ Ern("(Se for ele, ele veio até aqui para me ver. Ou para me vigiar. Ou para saber se eu estaria na varanda. Não consigo tirar nenhuma das três da lista.)","sad"),
+ Nar("Ernani fica ali até a chuva molhar a camisa. Lembra, sem querer, de uma frase que nunca ninguém lhe disse, e que ele fala sozinho, em voz baixa:"),
+ Ern("Eu não sei se ele me quer. Eu sei que eu quero ele. E eu não sei qual das duas coisas é pior."),
+ Nar("Ele volta para dentro, seca as mãos na camisa e pega o celular. A conversa está aberta. O cursor pisca, esperando."),
+ Nar("Ele escreve. Apaga. Escreve de novo. Apaga. Escreve “você está bem?” e apaga, porque é pergunta de amigo. Escreve “eu”, e só isso, e apaga. Sete rascunhos."),
+ {q:"O cursor pisca. O que Ernani envia?",ch:[
+   {t:"“Está acordado?” (as mesmas palavras da outra noite)",fx:()=>{add("love",1);G.flags.amorDito=1},do:[Nar("Enviado. Ernani larga o celular sobre a mesa como se queimasse."),Nar("Aparece: digitando... Some. Aparece de novo. Some."),Nar("Quatro minutos depois, chega uma única palavra:"),Xx("Estou."),Nar("Só isso. Ernani lê, relê, vira o celular e tira da tela. Passa a madrugada tentando decidir se foi uma porta se abrindo, ou apenas uma resposta educada para uma pergunta educada."),Ern("(Ele respondeu. Isso é bom. Ele respondeu só uma palavra. Isso é ruim. Eu preciso dormir.)")]},
+   {t:"Escrever a verdade pela metade: “Senti cheiro de jasmim. Pensei em você. Ignore.”",fx:()=>{add("love",2);G.flags.amorDito=2},do:[Nar("Enviado. Ernani se arrepende antes de o aviso de entrega aparecer."),Nar("Doze minutos. Ele conta."),Xx("Jasmim floresce à noite. É só botânica."),Nar("Ele sente o rosto esquentar. Digita: “Claro.” Apaga. Digita: “Boa noite.” Antes de enviar, chega outra mensagem:"),Xx("Boa noite, Ernani."),Ern("(É uma porta se fechando? Ou é alguém que não sabe o que responder? Eu não sei. Eu não sei. Eu não sei.)","sad"),Nar("Ele não dorme. Mas é a primeira noite, em muito tempo, que o motivo da insônia é bom e ruim ao mesmo tempo.")]},
+   {t:"Não enviar nada. Guardar o celular na gaveta.",fx:()=>{G.flags.amorDito=0},do:[Nar("Ernani coloca o celular na gaveta da cozinha, entre pilhas velhas e o manual da geladeira. Fecha. Fica olhando a gaveta como quem escondeu uma prova."),Ern("(Se eu não perguntar, ele não pode dizer não.)","sad"),Nar("A decisão parece sensata. Sensata é a palavra que Ernani usa quando está com medo.")]}]},
+ Nar("De madrugada, a chuva para. Ernani fica de pé na sala escura, ouvindo os próprios pensamentos. O pior de amar alguém sem saber se é correspondido não é a dor. É o hábito: acordar e procurar o nome na tela antes de procurar os óculos."),
+ Nar("O celular vibra. Ernani o pega com tanta pressa que quase o derruba."),
+ Nar("Não é ele. É o Menino do Milho: “Chefe, tá acordado? Os lotes do porto estão estranhos.”"),
+ Ern("(Eu preciso de um problema que eu consiga resolver.)"),
+ Nar("Ernani liga de volta. Era mais fácil falar de peso de contêiner."),
+ {go:"sx0"}
 ];
 
 /* ---------- ATO III ---------- */
