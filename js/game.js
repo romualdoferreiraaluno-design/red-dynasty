@@ -143,7 +143,7 @@ function updSnd(){$('sndBtn').textContent=AUDIO.on?'🔊':'🔇'}
 function toTitle(){
   mode='title';view='bg';bgName='title';queue=[];done=null;PORT.k=null;hideDlg();$('card').classList.remove('on');showHud(false);$('touch').style.display='none';$('hint').style.display='none';AUDIO.setMood('title');
   const p=$('panel');p.className='on tt';const e=endings(),has=!!localStorage.getItem(SAVE_KEY);
-  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.6</div>'+
+  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.7</div>'+
   '<div class="col"><button class="btn" id="bNew">▶ Novo Jogo</button><button class="btn" id="bCont"'+(has?'':' disabled')+'>Continuar</button><button class="btn" id="bOpt">Opções (qualidade e som)</button><button class="btn" id="bInfo">Como trocar as imagens</button></div>'+
   '<p class="sub">Finais encontrados: '+e.length+'/4'+(e.includes('true')?' • ✦ Final verdadeiro desbloqueado':'')+'</p></div>';
   $('bNew').onclick=()=>{AUDIO.resume();p.className='';G=fresh();startGame()};
@@ -830,7 +830,7 @@ S.sx_porta=[
  Nar("Atrás da pilha de contêineres 14, onde o mapa do porto mostra só concreto, há um portão baixo de ferro. Na fechadura, um recesso circular. O disco encaixa com um estalo seco."),
  Nar("Sob o cais, a escada desce muito mais do que deveria. O ar é frio, mineral, com cheiro de incenso velho e terra molhada."),
  Nar("O Tigre para no primeiro degrau. Olha para o Menino do Milho. Não atravessa."),
- Mil("Eu preciso entrar. Se não for eu, vai ser a Segurança, e eles vão destruir tudo antes que alguém entenda."),
+ Mil("Eu preciso entrar. Se não for eu, vai ser a Segurança, e eles vão destruir tudo antes que alguém entenda.","determined"),
  Nar("O Tigre baixa a cabeça, encosta a testa no peito dele e, depois de um longo suspiro, desce na frente."),
  Mil("Obrigado. Eu te devo mais uma.","smile"),
  {bg:"templo"},
@@ -846,7 +846,7 @@ S.sx_grav=[
  Nar("A fita continua. Um silêncio longo. Depois, bem baixo, atrás do chiado: “Menino do Mi—”"),
  Nar("O nome está incompleto. A segunda regra do avô sobe pela garganta como um gosto de metal."),
  {q:"A voz espera. O Tigre eriça o pelo.",ch:[
-   {t:"Responder: “Estou aqui.”",fx:()=>{G.seita.contam++},do:[Nar("Silêncio. Depois, na fita, a voz repete a sua resposta, palavra por palavra, só que mais velha. Por alguns segundos, você não sente o próprio coração."),Mil("...Tá. Isso foi péssima ideia.","sad")]},
+   {t:"Responder: “Estou aqui.”",fx:()=>{G.seita.contam++},do:[Nar("Silêncio. Depois, na fita, a voz repete a sua resposta, palavra por palavra, só que mais velha. Por alguns segundos, você não sente o próprio coração."),Mil("...Tá. Isso foi péssima ideia.","scared")]},
    {t:"Não responder. Desligar o gravador.",fx:()=>{G.seita.calma++},do:[Nar("Você aperta o botão. O chiado morre. O Tigre solta o ar, como quem também estava prendendo a respiração."),Mil("Regra dois. Valeu, vô.")]}]},
  {fn:sinal},Nar("[Pista da Seita 4/6 — Gravações contraditórias]")
 ];
@@ -854,7 +854,7 @@ S.sx_doc=[
  Nar("Uma pasta de papelão amarelada, aberta numa estante. Dentro, duas versões de um mesmo relatório."),
  Nar("Versão A, 1971, tinta azul: “A seita foi dissolvida. Os últimos Guardiões morreram durante a perseguição.”"),
  Nar("Versão B, 2031, papel timbrado do Instituto de Qinghe: “Convênio 07 — calibração do núcleo DUPE com os registros do Primeiro Campo.” Assinatura ilegível. Carimbo oficial."),
- Mil("Alguém mentiu em uma das duas. Ou nas duas."),
+ Mil("Alguém mentiu em uma das duas. Ou nas duas.","thinking"),
  Nar("O DUPE não nasceu do nada. Alguém leu aquelas páginas antes de construí-lo. E essa pessoa tinha carimbo oficial."),
  {fn:sinal},Nar("[Pista da Seita 5/6 — Documentos conflitantes]")
 ];
@@ -884,7 +884,7 @@ S.sx_altar=[
  Nar("O altar. No topo, sobre um disco de pedra gravado com três anéis, um grão do tamanho de um dedo, dourado, com uma luz interna que pulsa devagar, como se respirasse."),
  Nar("O Tigre passa na frente do Menino do Milho. Senta-se diante do altar, de costas para ele, e fica ali. Como quem espera alguém. Não há nada sobrenatural nisso. Ele simplesmente espera."),
  Mil("Regra um: nunca pegar um Grão perto de uma estrutura circular."),
- Mil("Isso aqui é inteiro circular."),
+ Mil("Isso aqui é inteiro circular.","scared"),
  {glitch:30},
  Sei("Ele disse que viria alguém. Esperávamos que fosse mais tarde.","neutral"),
  Nar("Uma figura de capuz escuro, que ninguém ouviu entrar, está de pé entre duas colunas. Não ergue as mãos. Não ameaça."),
