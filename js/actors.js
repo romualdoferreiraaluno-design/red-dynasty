@@ -10,10 +10,12 @@ const ACT=(()=>{
     ernani:{n:'Ernani',skin:'#d9a07a',skinD:'#a8704e',hair:'#2a1a12',cloth:'#4b5a3a',cloth2:'#1a2030',acc:'lanyard',eye:'#2a1a10',bg:['#1c2a1c','#060a08'],rim:['#40e0ff','#ff40a0'],h:1.0},
     milho:{n:'Menino do Milho',skin:'#d9a07a',skinD:'#a8704e',hair:'#2a1a12',cloth:'#eeeeee',cloth2:'#1a2a4a',acc:'glasses',eye:'#2a1a10',bg:['#12203a','#04060c'],rim:['#40a0ff','#ffd040'],h:.96},
     lobao:{n:'Lobão',skin:'#d9a07a',skinD:'#a8704e',hair:'#3a3a3a',cloth:'#f2f2f2',cloth2:'#222',acc:'glassbeard',eye:'#2a1a10',bg:['#2a0c0c','#0a0404'],rim:['#ff4040','#40ff90'],h:1.0},
+    seita:{n:'Guardião',skin:'#8a6a50',skinD:'#5a4030',hair:null,cloth:'#1a1216',cloth2:'#8a1010',acc:'none',eye:'#c8a040',bg:['#3a0a08','#050203'],rim:['#ff3a20','#d4a017'],h:1.08},
     x:{n:'*****',skin:'#b8805a',skinD:'#8a5a3a',hair:'#1a1210',cloth:'#7a1020',cloth2:'#2a2a30',acc:'beard',eye:'#2a1a10',bg:['#0c2a0c','#020a04'],rim:['#40ff70','#ff3040'],h:1.1}
   };
   const IM={};
   const loadI=(k,p)=>{const key=p+'.'+k;if(IM[key]!==undefined)return IM[key];IM[key]=null;const im=new Image();im.onload=()=>{IM[key]=im};im.onerror=()=>{IM[key]=false};im.src='assets/'+(p==='p'?'portraits/':'sprites/')+k+'.png';return null};
+  ['novico','iniciado','guardiao','mestre','anciao'].forEach(n=>{DEF['seita_'+n]=Object.assign({},DEF.seita,{n:({novico:'Noviço',iniciado:'Iniciado',guardiao:'Guardião',mestre:'Mestre',anciao:'Ancião'})[n]})});
   Object.keys(DEF).forEach(k=>{loadI(k,'p');loadI(k,'s');['neutral','angry','smile','sad','surprised'].forEach(e=>loadI(k+'_'+e,'p'));for(let i=0;i<6;i++)loadI(k+'_w'+i,'s')});['tigre','tigre_w0','tigre_w1','tigre_w2','tigre_int','tigre_atk','tigre_bite','tigre_roar'].forEach(k=>loadI(k,'s'));loadI('tigre','p');
 
   const L=48,buf=mk(L,L),b=buf.getContext('2d');b.imageSmoothingEnabled=false;

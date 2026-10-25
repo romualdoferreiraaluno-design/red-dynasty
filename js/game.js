@@ -13,7 +13,7 @@ const CH=ACT.DEF;
 let PORT={k:null,expr:'neutral'},dtS=.016;
 
 /* ---------- ESTADO ---------- */
-const fresh=()=>({love:0,mao:3,unrest:2,research:0,frag:0,flags:{},dupe:1,zee:0,money:150,infl:0,scene:'intro',found:{}});
+const fresh=()=>({love:0,mao:3,unrest:2,research:0,frag:0,flags:{},dupe:1,zee:0,money:150,infl:0,scene:'intro',found:{},seita:{sinais:0,grao:0,contam:0,aliado:0,calma:0}});
 let G=fresh();
 let mode='title',view='bg',bgName='black',queue=[],done=null,typing=null,typeFull=null,waiting=null,shake=0,glitchT=0,T=0,cardTok=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -113,6 +113,7 @@ function openMenu(){
   m.innerHTML='<div class="box"><h2>Status</h2>'+bar('Vínculo com *****',G.love,10,'#e5a')+bar('Confiança de Mao',G.mao,10,'#e33')+bar('Pressão social',G.unrest,10,'#fa3')+bar('Pesquisa (Lobão)',G.research,10,'#3cf')+bar('Fragmentos de memória',G.frag,5,'#cf6')+
   '<p>DUPE nv.'+G.dupe+' • ZEE '+G.zee+' • Influência '+G.infl+'% • ¥'+G.money+'</p>'+
   '<h2>Inventário</h2><p>Ernani: pistola, crachá, tablet.<br>Menino do Milho: moto, capacete, celular, mochila, Tigre.<br>Lobão: notebook, tablet, jaleco, materiais químicos.<br>Fragmentos: '+G.frag+'/5</p>'+
+  '<h2>Seita do Grão</h2><p>Pistas: '+G.seita.sinais+'/6 • Grão: '+(G.seita.grao?'com o Menino do Milho (contaminação '+G.seita.contam+')':G.seita.aliado?'deixado; aliança com uma ala dos Guardiões':'—')+'</p>'+
   '<h2>Requisitos do final verdadeiro <small>(debug do Alpha)</small></h2>'+chk(G.love>=5,'Vínculo ≥ 5')+chk(G.mao>=5,'Confiança de Mao ≥ 5')+chk(G.frag>=3,'Fragmentos ≥ 3')+chk(G.research>=4,'Pesquisa ≥ 4')+chk(G.unrest<=6,'Pressão social ≤ 6')+
   '<div id="mOpts"></div><div class="col"><button class="btn" id="mSave">Salvar</button><button class="btn" id="mBack">Voltar ao jogo</button><button class="btn" id="mTitle">Menu principal</button></div></div>';
   const ro=()=>{$('mOpts').innerHTML=optsHTML();bindOpts($('mOpts'),ro)};ro();
@@ -142,7 +143,7 @@ function updSnd(){$('sndBtn').textContent=AUDIO.on?'🔊':'🔇'}
 function toTitle(){
   mode='title';view='bg';bgName='title';queue=[];done=null;PORT.k=null;hideDlg();$('card').classList.remove('on');showHud(false);$('touch').style.display='none';$('hint').style.display='none';AUDIO.setMood('title');
   const p=$('panel');p.className='on tt';const e=endings(),has=!!localStorage.getItem(SAVE_KEY);
-  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.2</div>'+
+  p.innerHTML='<div class="box"><h1>RED DYNASTY</h1><div class="sub" style="letter-spacing:3px">THE PRICE OF ASCENSION</div><div class="sub">中国 • O Amor Impossível do Império • Alpha 0.4</div>'+
   '<div class="col"><button class="btn" id="bNew">▶ Novo Jogo</button><button class="btn" id="bCont"'+(has?'':' disabled')+'>Continuar</button><button class="btn" id="bOpt">Opções (qualidade e som)</button><button class="btn" id="bInfo">Como trocar as imagens</button></div>'+
   '<p class="sub">Finais encontrados: '+e.length+'/4'+(e.includes('true')?' • ✦ Final verdadeiro desbloqueado':'')+'</p></div>';
   $('bNew').onclick=()=>{AUDIO.resume();p.className='';G=fresh();startGame()};
@@ -160,22 +161,29 @@ const MAPS={
     rows:["####################","#..cc..........RRR.#","#..cc....B.....RRR.#","#..................#","#.TT......TT.......#","#.TT......TT...N...#","#..................#","#.cc.......M.M.....#","#..................#","#..................#","########DD##########"]},
   qinghe:{need:3,then:'cap8b',start:[9,9],pal:{bg:'#101010',f1:'#3a3636',f2:'#343030',wall:'#1c1818',wall2:'#4a4444'},
     items:{F:{id:'F',multi:true,scenes:['q1','q2','q3']}},
-    rows:["####################","#..rr.......F...rr.#","#..................#","#.rrr..........rrr.#","#..................#","#.......F..........#","#..rr..........rr..#","#..................#","#.............F....#","#..................#","####################"]}
+    rows:["####################","#..rr.......F...rr.#","#..................#","#.rrr..........rrr.#","#..................#","#.......F..........#","#..rr..........rr..#","#..................#","#.............F....#","#..................#","####################"]},
+  porto:{need:3,then:'sx_porta',start:[9,9],style:'porto',hero:'milho',tiger:true,mood:'porto_noite',amb:'#2c3c52',pal:{bg:'#05080e',f1:'#16202c',f2:'#121b26',wall:'#1a2430',wall2:'#2a3848'},
+    items:{S:{id:'caixa',scene:'sx_caixa'},N:{id:'caderno',scene:'sx_caderno'},K:{id:'selo',scene:'sx_selo'}},
+    rows:["########YYY#########","#CC..kk.....L...CC.#","#CC........b....CC.#","#.....L..kk....S...#","#..bb...........b..#","#...L.......CC.....#","#..N........CC.k.K.#","#.........b........#","#CC....kk........CC#","#CC............L...#","####################"]},
+  templo:{need:4,then:'sx_out',start:[9,9],style:'templo',hero:'milho',tiger:true,mood:'templo',amb:'#3a2426',pal:{bg:'#060203',f1:'#1c100f',f2:'#170c0c',wall:'#120808',wall2:'#2c1a18'},
+    items:{G:{id:'grav',scene:'sx_grav'},P:{id:'doc',scene:'sx_doc'},m:{id:'mask',scene:'sx_mask'},A:{id:'altar',scene:'sx_altar',last:true}},
+    rows:["####################","#sss.....AA.....sss#","#m...p..f..f..p....#","#m.................#","#......h....h......#","#s...p........p....#","#s.....f....f....G.#","#.......h..h.......#","#.P..p........p....#","#..f..h......h..f..#","####################"]}
 };
+Object.keys(MAPS).forEach(k=>MAPS[k].rows.forEach(r=>{if(r.length!==20)throw new Error('mapa '+k+': linha com tamanho '+r.length)}));
 MAPS.lab.rows.forEach(r=>{if(r.length!==20)throw new Error('mapa lab: linha com tamanho '+r.length)});
 MAPS.qinghe.rows.forEach(r=>{if(r.length!==20)throw new Error('mapa qinghe: linha com tamanho '+r.length)});
 let E=null;
 const TS=48,OY=6;
 function startExplore(map){
-  const m=MAPS[map];E={map,x:m.start[0],y:m.start[1],face:[0,-1],cd:0,step:0,vx:m.start[0]*TS+TS/2,vy:m.start[1]*TS+OY+TS-6,walk:0,moving:false};
-  mode='explore';view='explore';AUDIO.setMood(map==='lab'?'lab':'qinghe');updTouch();
+  const m=MAPS[map];E={map,x:m.start[0],y:m.start[1],face:[0,-1],cd:0,step:0,vx:m.start[0]*TS+TS/2,vy:m.start[1]*TS+OY+TS-6,walk:0,moving:false,tr:[[m.start[0],m.start[1]]],tx:m.start[0]*TS+TS/2,ty:m.start[1]*TS+OY+TS-6,tf:1,tm:false};
+  mode='explore';view='explore';AUDIO.setMood(m.mood||(map==='lab'?'lab':'qinghe'));updTouch();
 }
 function updTouch(){$('touch').style.display=(mode==='explore'&&'ontouchstart' in window)?'block':'none'}
-const SOLID='#cTRrBNMDF';
+const SOLID='#cTRrBNMDFCkLbSKYpfsmGPAh';
 function solidAt(x,y){const m=MAPS[E.map],g=m.rows[y]&&m.rows[y][x];return !g||SOLID.includes(g)}
 function nearItem(){
   const m=MAPS[E.map],c=[[E.x+E.face[0],E.y+E.face[1]],[E.x+1,E.y],[E.x-1,E.y],[E.x,E.y+1],[E.x,E.y-1]];
-  for(const [x,y] of c){const g=m.rows[y]&&m.rows[y][x],it=g&&m.items[g];if(!it)continue;const key=E.map+(it.multi?x+','+y:it.id);if(G.found[key])continue;return{x,y,it,key}}
+  for(const [x,y] of c){const g=m.rows[y]&&m.rows[y][x],it=g&&m.items[g];if(!it)continue;const key=E.map+(it.multi?x+','+y:it.id);if(G.found[key])continue;if(it.last&&countFound()<MAPS[E.map].need-1)continue;return{x,y,it,key}}
   return null;
 }
 function countFound(){return Object.keys(G.found).filter(k=>k.startsWith(E.map)).length}
@@ -190,15 +198,17 @@ function exploreAct(){
 function updateExplore(dt){
   E.cd-=dt;
   if(E.cd<=0){let dx=0,dy=0;if(keys.left)dx=-1;else if(keys.right)dx=1;else if(keys.up)dy=-1;else if(keys.down)dy=1;
-    if(dx||dy){E.face=[dx,dy];const nx=E.x+dx,ny=E.y+dy;if(!solidAt(nx,ny)){E.x=nx;E.y=ny;E.step++}E.cd=115}}
+    if(dx||dy){E.face=[dx,dy];const nx=E.x+dx,ny=E.y+dy;if(!solidAt(nx,ny)){E.x=nx;E.y=ny;E.step++;E.tr.push([nx,ny]);if(E.tr.length>8)E.tr.shift()}E.cd=115}}
   const tx=E.x*TS+TS/2,ty=E.y*TS+OY+TS-6,ddx=tx-E.vx,ddy=ty-E.vy,d=Math.hypot(ddx,ddy);
   E.moving=d>1;if(d>1){const k=Math.min(1,dt*.42/d);E.vx+=ddx*k;E.vy+=ddy*k;E.walk=(E.walk+dt/440)%1}else{E.vx=tx;E.vy=ty;E.walk=0}
+  {const q=E.tr[Math.max(0,E.tr.length-3)],qx=q[0]*TS+TS/2,qy=q[1]*TS+OY+TS-6,dx=qx-E.tx,dy=qy-E.ty,dd=Math.hypot(dx,dy);
+   E.tm=dd>2;if(dd>2){const k=Math.min(1,dt*.38/dd);E.tx+=dx*k;E.ty+=dy*k;if(Math.abs(dx)>1)E.tf=dx<0?-1:1}else{E.tx=qx;E.ty=qy}}
   const h=$('hint'),f=nearItem();h.style.display='block';h.textContent=(f?'▶ Examinar (Espaço / A)   ':'')+'Pistas '+countFound()+'/'+MAPS[E.map].need;
 }
 function drawExplore(){
-  const m=MAPS[E.map],g=ctx,lab=E.map==='lab';
+  const m=MAPS[E.map],g=ctx,lab=E.map==='lab',st=m.style||(lab?'lab':'ruin');
   g.fillStyle=m.pal.bg;g.fillRect(0,0,W,H);
-  FX.begin(lab?'#2a463f':'#4f4846');
+  FX.begin(m.amb||(lab?'#2a463f':'#4f4846'));
   const props=[];
   for(let y=0;y<11;y++)for(let x=0;x<20;x++){
     const ch=m.rows[y][x],px=x*TS,py=y*TS+OY,odd=(x+y)%2;
@@ -209,6 +219,8 @@ function drawExplore(){
     const r=rnd(x*17+y*31+(lab?1:9));
     if(r>.78){g.fillStyle='rgba(0,0,0,.25)';g.fillRect(px+6+r*20,py+8+r*18,10+r*14,3)}
     if(r<.1){g.fillStyle=lab?'rgba(60,255,110,.08)':'rgba(200,190,180,.07)';g.fillRect(px+4,py+4,TS-8,TS-8)}
+    if(st==='porto'){g.fillStyle='rgba(0,0,0,.28)';g.fillRect(px,py+TS/2,TS,1);if(r>.55){g.fillStyle='rgba(150,190,230,'+(.05+.05*Math.sin(T*2+x))+')';g.fillRect(px+3,py+10,TS-8,TS-26)}}
+    if(st==='templo'){if(x>=8&&x<=11){g.fillStyle='rgba(150,30,25,.3)';g.fillRect(px,py,TS,TS);if(x===8||x===11){g.fillStyle='rgba(212,160,60,.25)';g.fillRect(x===8?px:px+TS-2,py,2,TS)}}if(r>.85){g.fillStyle='rgba(160,30,20,.2)';g.fillRect(px+8,py+20,TS-16,2)}}
     if(ch!=='.')props.push([ch,x,y,px,py]);
   }
   const lightsOn=[];
@@ -217,6 +229,8 @@ function drawExplore(){
     g.save();g.translate(px,py);
     if(ch==='#'){
       g.fillStyle=m.pal.wall;g.fillRect(0,0,TS,TS);g.fillStyle=m.pal.wall2;g.fillRect(0,0,TS,9);
+      if(st==='porto'){g.globalAlpha=.5;g.fillStyle=['#5a2a24','#24425a','#5a4a24','#2a4a3a'][(x*3+y)%4];g.fillRect(0,0,TS,TS);g.globalAlpha=1;g.fillStyle='rgba(0,0,0,.4)';for(let i=0;i<8;i++)g.fillRect(i*6+1,10,2,TS-10)}
+      if(st==='templo'){g.fillStyle='rgba(0,0,0,.35)';for(let i=0;i<3;i++)g.fillRect(0,12+i*13,TS,1);for(let i=0;i<4;i++)g.fillRect(((i+y)%2)*12+i*12,9,1,TS-9)}
       g.fillStyle='rgba(0,0,0,.3)';for(let i=0;i<4;i++)g.fillRect(i*12,9,1,TS-9);
       g.fillStyle='rgba(255,255,255,.05)';g.fillRect(0,9,TS,2);
       const gr=g.createLinearGradient(0,TS*.4,0,TS);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.55)');g.fillStyle=gr;g.fillRect(0,0,TS,TS);
@@ -225,7 +239,8 @@ function drawExplore(){
       g.scale(2,2);
       const R=(a,b,c,d,col)=>{g.fillStyle=col;g.fillRect(a,b,c,d)};
       R(1,20,22,3,'rgba(0,0,0,.4)');
-      if(ch==='c'){R(2,2,20,20,'#2a3236');R(2,2,20,3,'#3c474c');R(2,2,2,20,'rgba(255,255,255,.08)');for(let i=0;i<3;i++){R(4+i*6,6+(i%2)*3,4,8,lab?'#1f5a30':'#555');R(5+i*6,7+(i%2)*3,2,3,lab?'#5fff8a':'#aaa')}R(4,17,16,2,'#0a0e10');lightsOn.push([px+TS/2,py+TS/2,90,'rgba(60,255,110,.5)',.7])}
+      if(st==='porto'||st==='templo')propNew(R,ch,fd,x,y,px,py,lightsOn);
+      else if(ch==='c'){R(2,2,20,20,'#2a3236');R(2,2,20,3,'#3c474c');R(2,2,2,20,'rgba(255,255,255,.08)');for(let i=0;i<3;i++){R(4+i*6,6+(i%2)*3,4,8,lab?'#1f5a30':'#555');R(5+i*6,7+(i%2)*3,2,3,lab?'#5fff8a':'#aaa')}R(4,17,16,2,'#0a0e10');lightsOn.push([px+TS/2,py+TS/2,90,'rgba(60,255,110,.5)',.7])}
       else if(ch==='T'){R(1,5,22,15,'#3a3a44');R(1,5,22,4,'#585866');R(1,5,22,1,'rgba(255,255,255,.2)');R(3,20,2,3,'#222');R(19,20,2,3,'#222');R(5,2,6,4,'#c0c8d0');R(14,3,5,3,'#a0602a')}
       else if(ch==='R'){const a=.45+.3*Math.sin(T*3+x);R(0,0,24,24,'#10202a');R(1,2,22,20,'rgba(60,255,90,'+a+')');R(0,0,24,3,'#223');R(0,21,24,3,'#223');for(let i=0;i<3;i++)R(3+i*7,4+((T*20+i*9)%14),2,2,'rgba(220,255,230,.8)');lightsOn.push([px+TS/2,py+TS/2,150,'rgba(60,255,100,.9)',.9])}
       else if(ch==='B'){R(0,2,24,20,'#16301f');R(0,2,24,2,'#3a2a1a');R(3,6,18,2,fd?'#456':'#dfd');R(3,12,12,2,fd?'#456':'#dfd');R(3,17,8,2,fd?'#456':'#dfd');if(!fd)lightsOn.push([px+TS/2,py+TS/2,80,'rgba(255,240,150,.7)',.4+.3*Math.sin(T*4)])}
@@ -239,11 +254,38 @@ function drawExplore(){
   }
   // sombra suave de cada parede e personagem
   const face=E.face[0]<0?-1:1;
-  ACT.sprite(g,'ernani',E.vx,E.vy,2.3,{walk:E.moving?E.walk:0,face,t:T});
+  if(m.tiger){const tgd=()=>ACT.tiger(g,E.tx,E.ty,1.25,{t:T,face:E.tf,walk:E.tm?1:0});
+    if(E.ty<E.vy){tgd();ACT.sprite(g,m.hero,E.vx,E.vy,2.3,{walk:E.moving?E.walk:0,face,t:T})}else{ACT.sprite(g,m.hero,E.vx,E.vy,2.3,{walk:E.moving?E.walk:0,face,t:T});tgd()}}
+  else ACT.sprite(g,m.hero||'ernani',E.vx,E.vy,2.3,{walk:E.moving?E.walk:0,face,t:T});
   lightsOn.forEach(l=>FX.light(l[0],l[1],l[2],l[3],l[4]));
   FX.light(E.vx+E.face[0]*34,E.vy-46+E.face[1]*30,330,'rgba(255,240,215,.95)',1);
   if(Math.random()<.04)FX.dust(1,lab?'rgba(120,255,160,.5)':'rgba(220,210,200,.4)');
-  if(!lab&&Math.random()<.2)FX.ash(1);
+  if(st==='ruin'&&Math.random()<.2)FX.ash(1);if(st==='porto')FX.rain(420,dtS);if(st==='templo'&&Math.random()<.08)FX.embers(1);
+}
+function propNew(R,ch,fd,x,y,px,py,L){
+  const cx=px+TS/2,cy=py+TS/2,mark=(c,r)=>{if(!fd)L.push([cx,cy,r||90,c||'rgba(255,220,130,.8)',.45+.3*Math.sin(T*4+x)])};
+  const sp=(w,h)=>{if(!fd){const a=.5+.4*Math.sin(T*4+x+y),bb=Math.sin(T*5)*1.5;R(w,h,2,2,'rgba(255,230,150,'+a+')');R(w+6,h-4,1,1,'rgba(255,230,150,'+a+')');R(9,-6+bb,6,2,'rgba(255,215,110,.95)');R(10,-4+bb,4,2,'rgba(255,215,110,.95)');R(11,-2+bb,2,2,'rgba(255,215,110,.95)')}};
+  switch(ch){
+   case 'C':{const cs=['#6a2a24','#24486a','#6a5a24','#245a44','#4a3a28'],c=cs[(x*5+y*3)%5];R(0,1,24,22,c);for(let i=1;i<8;i++)R(i*3,3,1,18,'rgba(0,0,0,.4)');R(0,1,24,2,'rgba(255,255,255,.15)');R(0,20,24,3,'rgba(0,0,0,.5)');R(2,8,6,3,'rgba(220,200,150,.25)');break}
+   case 'k':R(1,4,22,18,'#4a3220');R(1,4,22,2,'#6a4a30');for(let i=0;i<4;i++)R(2+i*6,6,1,16,'rgba(0,0,0,.4)');R(1,12,22,1,'rgba(0,0,0,.45)');break;
+   case 'L':R(11,3,2,19,'#080b10');R(7,1,10,3,'#ffcf80');R(8,0,8,1,'#0a0e14');L.push([cx,py+6,170,'rgba(255,175,90,.85)',.85+.05*Math.sin(T*30)]);break;
+   case 'b':R(5,5,14,16,'#3a281a');R(5,8,14,1,'#161008');R(5,16,14,1,'#161008');R(6,5,12,2,'rgba(255,255,255,.1)');break;
+   case 'S':R(1,5,22,17,'#4a3220');R(1,5,22,2,'#6a4a30');for(let i=0;i<4;i++)R(2+i*6,7,1,15,'rgba(0,0,0,.4)');R(5,18,14,3,fd?'#8a1818':'#150b0b');if(fd)R(11,19,2,1,'#d4a017');sp(18,4);mark('rgba(255,200,100,.7)',80);break;
+   case 'N':R(5,7,14,14,'#3a281a');R(5,10,14,1,'#161008');R(5,17,14,1,'#161008');R(6,3,12,5,fd?'#7a6a48':'#e8d8a0');R(11,3,1,5,'#654');sp(16,0);mark();break;
+   case 'K':R(8,8,8,13,'#101418');R(7,6,10,3,'#1a2028');R(9,3,6,4,fd?'#6a4a18':'#d09a28');R(11,4,2,2,'#401');sp(15,1);mark('rgba(255,190,90,.8)',90);break;
+   case 'Y':{const open=countFound()>=MAPS.porto.need;R(0,0,24,24,'#0a0e14');for(let i=0;i<6;i++)R(2+i*4,2,2,20,'#2a3440');R(0,10,24,2,'#2a3440');if(open){R(0,0,24,24,'rgba(255,180,80,.18)');L.push([cx,cy,120,'rgba(255,170,80,.7)',.6+.3*Math.sin(T*3)])}break}
+   case 'p':R(6,0,12,22,'#2c1816');R(5,0,14,3,'#4a2824');R(5,19,14,3,'#4a2824');R(6,3,12,1,'rgba(180,40,30,.6)');R(8,0,2,22,'rgba(255,160,120,.08)');break;
+   case 'f':{R(11,10,2,12,'#0a0606');R(5,18,14,4,'#1a0c0a');R(6,8,12,5,'#2a1612');R(5,7,14,2,'#d4781c');
+     const f1=Math.sin(T*9+x*3)*2,f2=Math.sin(T*7+y*2)*1.5;R(8,0+f1*.3,8,8,'rgba(255,120,30,.85)');R(10,-3+f2*.3,4,7,'rgba(255,220,130,.9)');
+     L.push([cx,cy-10,210,'rgba(255,120,40,.9)',.75+.25*Math.sin(T*9+x*2)*Math.sin(T*3.7+y)]);break}
+   case 's':R(0,1,24,21,'#1e130d');for(let r=0;r<3;r++){R(1,r*7+7,22,1,'#2a1b12');for(let k=0;k<8;k++){const h=4+((x*7+y*3+k*5+r)%3)*1.5;R(1+k*2.7,r*7+7-h,2.2,h,['#3a1a14','#1e2a2a','#4a3a20','#3a2230'][(k+r+x)%4])}}break;
+   case 'm':R(0,1,24,21,'#1e130d');R(1,7,22,1,'#2a1b12');R(1,15,22,1,'#2a1b12');for(let k=0;k<3;k++){R(3+k*7,2,5,5,'#d8c8a0');R(4+k*7,3,1,1,'#120');R(6+k*7,3,1,1,'#120')}for(let k=0;k<2;k++){R(5+k*10,10,5,5,'#c8b890');R(6+k*10,11,1,1,'#120');R(8+k*10,11,1,1,'#120')}sp(18,2);mark('rgba(255,210,140,.7)',80);break;
+   case 'G':R(2,12,20,9,'#2a1a10');R(3,3,18,10,'#1c1c20');R(5,5,5,5,'#0a0a0e');R(14,5,5,5,'#0a0a0e');if(!fd){const a=T*3;R(7+Math.cos(a)*1.5,7+Math.sin(a)*1.5,1,1,'#aaa');R(16+Math.cos(a)*1.5,7+Math.sin(a)*1.5,1,1,'#aaa')}R(10,11,4,2,fd?'#340808':'#d02020');sp(19,2);mark('rgba(255,90,70,.7)',90);break;
+   case 'P':R(2,12,20,9,'#2a1a10');R(4,5,16,8,fd?'#6a6048':'#d8cca6');R(6,4,14,8,fd?'#5a5038':'#cfc29a');R(8,7,8,1,'#8a3028');sp(17,0);mark();break;
+   case 'A':{const open=countFound()>=MAPS.templo.need-1;R(0,6,24,16,'#241410');R(0,4,24,3,'#3a2018');R(0,4,24,1,'rgba(212,160,60,.6)');
+     if(!fd){const a=open?.7+.3*Math.sin(T*3):.25;R(10,0,4,7,'rgba(255,200,80,'+a+')');R(11,1,2,5,'rgba(255,250,210,'+a+')');L.push([cx,cy-8,open?260:110,'rgba(255,190,80,.9)',a])}break}
+   case 'h':R(8,6,8,5,'#0a0506');R(7,10,10,12,'#0a0506');R(11,8,2,12,'rgba(180,40,30,.5)');R(7,21,10,1,'rgba(0,0,0,.6)');break;
+  }
 }
 function _noop(){}
 
@@ -262,10 +304,10 @@ function renderManage(){
   p.innerHTML='<div class="box"><h2>'+MG.title+'</h2><p>Turno '+MG.turn+' de '+MG.turns+' • ¥'+G.money+' • Influência '+clamp(G.infl,0,100)+'%</p>'+
    bar('DUPE (nível)',G.dupe,10,'#e33')+bar('ZEE',G.zee,10,'#3c6')+bar('Pesquisa',G.research,10,'#3cf')+bar('Pressão social',G.unrest,10,'#fa3')+bar('Confiança de Mao',G.mao,10,'#c3c')+
    '<div class="col acts" id="acts"></div><p id="fb">'+MG.fb+'</p></div>';
-  MACTS.forEach((a,i)=>{const b=document.createElement('button');b.className='btn';b.disabled=G.money<a.c;b.innerHTML=a.n+(a.c?' (¥'+a.c+')':'')+'<small>'+a.d+'</small>';b.onclick=()=>manageDo(i);$('acts').appendChild(b)});
+  acts().forEach((a,i)=>{const b=document.createElement('button');b.className='btn';b.disabled=G.money<a.c;b.innerHTML=a.n+(a.c?' (¥'+a.c+')':'')+'<small>'+a.d+'</small>';b.onclick=()=>manageDo(i);$('acts').appendChild(b)});
 }
 function manageDo(i){
-  const a=MACTS[i];G.money-=a.c;let fb=a.f();
+  const a=acts()[i];G.money-=a.c;let fb=a.f();
   G.unrest=clamp(G.unrest,0,10);G.infl=clamp(G.infl,0,100);
   const inc=G.dupe*12+G.zee*10;G.money+=inc;fb+=' (+¥'+inc+' de renda)';
   if(G.unrest>=8){G.infl=clamp(G.infl-6,0,100);G.money=Math.max(0,G.money-15);fb+=' ⚠ GREVES em Dongguan: −6% de influência, −¥15.'}
@@ -714,7 +756,7 @@ S.cap5=[
  Xx('Quando o Núcleo estiver pronto, ele vai nos observar. Quanto mais forte você sentir, mais ele aprende.'),
  Ern('Aprende o quê?'),
  Xx('Como controlar pessoas. A partir de quem elas amam.'),
- {go:'cap6'}
+ {go:'sx0'}
 ];
 
 S.cap6=[
@@ -737,6 +779,145 @@ S.cap6b=[
    {t:'Perguntar: “Já trabalhei em Qinghe?”',fx:()=>{G.flags.asked=1},do:[Nar('O nome sai da boca de Ernani sem aviso. Ele não sabe de onde veio.'),Mao('Nunca ouvi esse nome.'),Nar('Mao sustenta o olhar. Mas o copo na mão dele racha com um estalo mínimo.')]}]},
  Nar('A partir dali, nada era mais simples.'),
  {go:'cap7'}
+];
+
+/* SEITA */
+const Sei=(t,e)=>sayf('seita',t,e);
+const sinal=()=>{G.seita.sinais=Math.min(6,G.seita.sinais+1)};
+const GRAO_ACT={n:"Estudar o Grão (Lobão)",d:"+2 pesquisa. Cada estudo contamina o laboratório: a partir da 3ª vez, +pressão social.",c:20,f:()=>{add("research",2);G.seita.contam++;let t="Lobão passa a noite medindo o Grão. Os números não fecham, e ele sorri mesmo assim.";if(G.seita.contam>=3){G.unrest=clamp(G.unrest+1,0,10);t+=" Assistentes relatam vozes no corredor: +pressão social."}return t}};
+const acts=()=>MACTS.concat(G.seita&&G.seita.grao?[GRAO_ACT]:[]);
+
+S.sx0=[
+ {title:"CAPÍTULO 5½ — O MENINO E O SÍMBOLO",sub:"Interlúdio • Você controla o Menino do Milho"},
+ {bg:"porto_noite"},
+ Nar("Porto de Xangai, 01h40. Chove fino. O vapor sobe das docas e os guindastes piscam em vermelho, um depois do outro, como se contassem alguma coisa."),
+ Nar("Três lotes de componentes do DUPE chegaram com a papelada em ordem. O peso, não."),
+ Ern("Milho, o lote 17 pesa quarenta quilos a mais que o manifesto. Eu não posso aparecer aí, a Segurança vai perguntar por quê. Dá uma olhada. Sem alarde.","neutral"),
+ Mil("Sem alarde é meu sobrenome. Tigre, vem.","smile"),
+ Nar("O Tigre salta da caçamba da moto sem fazer um ruído. Ele não gosta do cheiro do cais. As orelhas estão coladas na cabeça."),
+ Mil("Calma, grandão. É só um porto."),
+ Nar("O Menino do Milho ainda não sabe, mas já viu aquela marca antes. Só não lembra onde."),
+ Nar("[Controle o Menino do Milho. Examine as pistas (Espaço / A). O Tigre vai atrás de você.]"),
+ {mode:"explore",map:"porto"}
+];
+S.sx_caixa=[
+ Nar("Lote 17. O contêiner está violado por fora, mas os lacres estão intactos, como se alguém tivesse aberto por dentro. Na lateral, em tinta desbotada: “Fornecimento Primeiro Campo Ltda.”"),
+ Mil("Primeiro Campo... Essa empresa não está em nenhum cadastro do DUPE."),
+ Nar("Ele se agacha. Sob o estrado de madeira, riscado a ferro quente, um desenho: três círculos incompletos cortados por uma linha vertical e, no centro, uma semente."),
+ {glitch:20},
+ Mil("Eu conheço isso."),
+ Nar("O Tigre rosna baixo. Não para o desenho. Para o escuro atrás do contêiner."),
+ {fn:sinal},Nar("[Pista da Seita 1/6 — O símbolo]")
+];
+S.sx_caderno=[
+ Nar("Um caderno de capa mole, preso por um barbante sobre um barril. A chuva não molhou as páginas. Alguém o deixou ali há pouco."),
+ Nar("Metade são medições de umidade e temperatura, em colunas perfeitas. A outra metade são orações. As duas letras são da mesma mão."),
+ Nar("Uma frase sublinhada duas vezes: “O Grão não distingue uma lembrança verdadeira de uma reconstrução convincente.”"),
+ Mil("Que tipo de gente mede temperatura e reza ao mesmo tempo?"),
+ Nar("Na última página, em tinta nova: “Para o neto de L., caso ele venha: não pegue o que brilhar.”"),
+ Mil("..."),
+ Nar("O Menino do Milho fecha o caderno devagar. Ninguém, nunca, chamou o avô dele só pela inicial."),
+ {fn:sinal},Nar("[Pista da Seita 2/6 — Caderno de cultivo]")
+];
+S.sx_selo=[
+ Nar("Um cabeço de ferro no cais e, preso nele, um disco de bronze do tamanho de uma palma, com o mesmo símbolo em relevo. Está quente. Não deveria estar, na chuva."),
+ Mil("Selo de passagem. Meu avô tinha um desenho disso na tampa de um baú que ele nunca deixou eu abrir."),
+ Nar("O Tigre cheira o disco e recua dois passos. Não rosna. Apenas recua."),
+ Mil("Eu sei, grandão. Eu também não gosto."),
+ {fn:sinal},Nar("[Pista da Seita 3/6 — Selo de passagem]")
+];
+S.sx_porta=[
+ Nar("Atrás da pilha de contêineres 14, onde o mapa do porto mostra só concreto, há um portão baixo de ferro. Na fechadura, um recesso circular. O disco encaixa com um estalo seco."),
+ Nar("Sob o cais, a escada desce muito mais do que deveria. O ar é frio, mineral, com cheiro de incenso velho e terra molhada."),
+ Nar("O Tigre para no primeiro degrau. Olha para o Menino do Milho. Não atravessa."),
+ Mil("Eu preciso entrar. Se não for eu, vai ser a Segurança, e eles vão destruir tudo antes que alguém entenda."),
+ Nar("O Tigre baixa a cabeça, encosta a testa no peito dele e, depois de um longo suspiro, desce na frente."),
+ Mil("Obrigado. Eu te devo mais uma.","smile"),
+ {bg:"templo"},
+ Nar("Embaixo do porto de Xangai existe um templo."),
+ Nar("Colunas de pedra escura, braseiros acesos, silhuetas ajoelhadas que, a esta distância, ainda podem ser só sombras. Ao fundo, um altar de três degraus. Em todas as paredes, o mesmo símbolo."),
+ Nar("[Examine o templo. O altar só responde depois que você entender onde está: encontre as 3 outras pistas.]"),
+ {mode:"explore",map:"templo"}
+];
+S.sx_grav=[
+ Nar("Um gravador de rolo sobre uma mesa baixa, ainda ligado à tomada. Duas fitas rotuladas com a mesma data: “Qinghe, 2038”."),
+ Nar("Na primeira, uma voz de mulher: “Eu nunca estive em Qinghe. Eu nunca estive em Qinghe.” Na segunda, a mesma voz, cansada: “Eu estava no reator. Eu vi tudo acontecer.”"),
+ Mil("Alguém gravou duas versões da mesma pessoa."),
+ Nar("A fita continua. Um silêncio longo. Depois, bem baixo, atrás do chiado: “Menino do Mi—”"),
+ Nar("O nome está incompleto. A segunda regra do avô sobe pela garganta como um gosto de metal."),
+ {q:"A voz espera. O Tigre eriça o pelo.",ch:[
+   {t:"Responder: “Estou aqui.”",fx:()=>{G.seita.contam++},do:[Nar("Silêncio. Depois, na fita, a voz repete a sua resposta, palavra por palavra, só que mais velha. Por alguns segundos, você não sente o próprio coração."),Mil("...Tá. Isso foi péssima ideia.","sad")]},
+   {t:"Não responder. Desligar o gravador.",fx:()=>{G.seita.calma++},do:[Nar("Você aperta o botão. O chiado morre. O Tigre solta o ar, como quem também estava prendendo a respiração."),Mil("Regra dois. Valeu, vô.")]}]},
+ {fn:sinal},Nar("[Pista da Seita 4/6 — Gravações contraditórias]")
+];
+S.sx_doc=[
+ Nar("Uma pasta de papelão amarelada, aberta numa estante. Dentro, duas versões de um mesmo relatório."),
+ Nar("Versão A, 1971, tinta azul: “A seita foi dissolvida. Os últimos Guardiões morreram durante a perseguição.”"),
+ Nar("Versão B, 2031, papel timbrado do Instituto de Qinghe: “Convênio 07 — calibração do núcleo DUPE com os registros do Primeiro Campo.” Assinatura ilegível. Carimbo oficial."),
+ Mil("Alguém mentiu em uma das duas. Ou nas duas."),
+ Nar("O DUPE não nasceu do nada. Alguém leu aquelas páginas antes de construí-lo. E essa pessoa tinha carimbo oficial."),
+ {fn:sinal},Nar("[Pista da Seita 5/6 — Documentos conflitantes]")
+];
+S.sx_mask=[
+ Nar("Uma prateleira de máscaras rígidas de madeira clara, cada uma com um número na testa. Faltam duas. Em uma das vagas, uma etiqueta com uma só letra: “L.”"),
+ Nar("Dentro de uma das máscaras, um papel dobrado: uma lista de nomes riscados à mão. Entre eles, nomes que Mao citou em discursos como “mártires da modernização”."),
+ Mil("Eles não são só fanáticos de roupão. Eles estiveram infiltrados em tudo."),
+ Nar("O Tigre fareja a vaga de “L.” por muito tempo. Depois deita-se diante dela, como num velório."),
+ {fn:sinal},Nar("[Pista da Seita 6/6 — Máscaras]")
+];
+const TAKE={t:"Pegar o Grão.",fx:()=>{G.seita.grao=1;G.seita.contam++;add("research",1);G.unrest=clamp(G.unrest+1,0,10)},do:[
+   Nar("É morno. É mais leve do que parece. Quando os dedos se fecham, o templo some por um instante."),
+   {glitch:80},{shake:18},
+   Nar("Você está num laboratório limpo, em Qinghe, 2038. Alguém te entrega um café e diz o seu nome inteiro. Você nunca esteve ali. Você estava em casa. E lembra de tudo perfeitamente."),
+   Nar("O templo volta. O Tigre está de pé, eriçado, olhando para você como se você fosse outra coisa."),
+   Sei("Eu não o impeço. Mas o Grão não distingue uma lembrança verdadeira de uma reconstrução convincente. Você acabou de aprender qual das duas era aquela."),
+   Mil("(Vou guardar isso no bolso e fingir que não aconteceu. Ótima estratégia.)","sad"),
+   Nar("[Grão obtido. Pesquisa +1, Pressão social +1. Você poderá pedir ao Lobão que o estude, mas todo estudo contamina um pouco mais.]")]};
+const LEAVE={t:"Deixar o Grão e pedir os arquivos.",fx:()=>{G.seita.aliado=1;G.unrest=clamp(G.unrest-1,0,10)},do:[
+   Mil("Eu não toco nisso. Mas quero os arquivos. Todos. E você garante que a Segurança não encoste neles antes de nós."),
+   Sei("Você é bem mais esperto que seu avô."),
+   Sei("As cópias irão com o Tigre. Os animais passam melhor que os homens por onde estamos."),
+   Nar("O Guardião toca o peito com dois dedos, numa saudação antiga, e some entre as colunas como se nunca tivesse estado ali."),
+   Nar("[Aliança com uma ala dos Guardiões. Pressão social −1. Os arquivos serão úteis mais adiante.]")]};
+S.sx_altar=[
+ {bg:"templo"},
+ Nar("O altar. No topo, sobre um disco de pedra gravado com três anéis, um grão do tamanho de um dedo, dourado, com uma luz interna que pulsa devagar, como se respirasse."),
+ Nar("O Tigre passa na frente do Menino do Milho. Senta-se diante do altar, de costas para ele, e fica ali. Como quem espera alguém."),
+ Mil("Regra um: nunca pegar um Grão perto de uma estrutura circular."),
+ Mil("Isso aqui é inteiro circular."),
+ {glitch:30},
+ Sei("Ele disse que viria alguém. Esperávamos que fosse mais tarde.","neutral"),
+ Nar("Uma figura de capuz escuro, que ninguém ouviu entrar, está de pé entre duas colunas. Não ergue as mãos. Não ameaça."),
+ Sei("Você é o neto do Velho L. Tem o mesmo jeito de falar sozinho."),
+ Mil("Você conheceu meu avô?"),
+ Sei("Conheci. Ele foi o último que acreditou que o Grão podia ser apenas guardado. Eu ainda tento."),
+ Mil("E você é de qual lado dessa seita? Do tipo que reza ou do tipo que quebra coisas?"),
+ Sei("Do tipo que ainda não decidiu. Somos muitos e não nos entendemos. Alguns querem guardar o Grão. Alguns querem usá-lo. E alguns... querem usar vocês."),
+ {q:"O Guardião estende a mão para o altar, sem tocá-lo.",ch:[
+   {t:"Perguntar: “Quem manda nessa seita?”",do:[
+      Sei("Ninguém manda em todos. Há um homem de quem já se fala como Cultivador-Mor. Ele dirige a ala que quer fazer da colheita uma lei. A voz dele já passou pelo seu país. Em gravações. Em retratos antigos."),
+      Sei("Pelo que sei, ele conhece vocês. Conhece o que vocês perderam melhor do que vocês mesmos."),
+      Mil("Isso foi a regra três falando."),
+      {q:"O Grão pulsa. O Guardião espera.",ch:[TAKE,LEAVE]}]},
+   TAKE,LEAVE]}
+];
+S.sx_out=[
+ {bg:"porto_noite"},
+ Nar("Amanhece. A chuva parou. O Menino do Milho sobe do porto com o Tigre atrás, e o mundo parece exatamente o mesmo, o que é um pouco ofensivo."),
+ Mil("Ernani, atende."),
+ Ern("Você demorou. Achou alguma coisa?"),
+ Mil("Achei um problema. Sabe aquele desenho que você viu no laboratório e achou que era marca de fabricante?"),
+ Ern("A semente com os círculos... Eu vi no reator, sim. Mas por que você está..."),
+ Mil("Porque ele também está embaixo do porto. E dentro do DUPE."),
+ Nar("Ernani fica em silêncio tempo suficiente para o Menino do Milho ouvir a própria respiração."),
+ Ern("Manda tudo para mim. Eu levo ao Lobão."),
+ {if:()=>G.seita.grao,then:[
+   Lob("Milho, seus olhos estão vermelhos. Quando foi a última vez que você dormiu?"),
+   Mil("Dormir? Que conceito."),
+   Nar("Dentro do bolso do casaco, algo pequeno e morno bate devagar. Como um coração. Como um segundo coração.")],
+  else:[Nar("Preso na coleira do Tigre, um tubo de couro com cópias de tudo. Ele caminha com a dignidade de quem sabe o valor do que carrega.")]},
+ {t:()=>"[Pistas da Seita: "+G.seita.sinais+"/6]"},
+ {go:"cap6"}
 ];
 
 /* ---------- ATO III ---------- */
