@@ -1,0 +1,22 @@
+module.exports=[
+ {name:'Idealista Ético',w:{mao:1,unrest:-2,research:1,love:1,etica:3},manageStyle:null,battleStyle:'smart'},
+ {name:'Romântico',w:{love:4,mao:.5},battleStyle:'smart'},
+ {name:'Tecnocrata',w:{research:3,money:.05,infl:.3,unrest:-.5},battleStyle:'smart'},
+ {name:'Maquiavélico',w:{mao:3,infl:.5,money:.05,unrest:-.2,love:-1},battleStyle:'aggr'},
+ {name:'Pacifista',w:{unrest:-4,love:1},battleStyle:'defensive'},
+ {name:'Min-maxer do final verdadeiro',w:{love:2,mao:2,research:2,unrest:-1.5,frag:2},noise:.05,battleStyle:'smart'},
+ {name:'Speedrunner (sempre 1ª opção)',style:'first',manageStyle:'first',battleStyle:'aggr'},
+ {name:'Contrário (sempre última)',style:'last',manageStyle:'last',battleStyle:'last'},
+ {name:'Aleatório puro',style:'random',manageStyle:'random',battleStyle:'rand'},
+ {name:'Preguiçoso (2ª opção)',style:'mid',manageStyle:'first',battleStyle:'aggr'},
+ {name:'Avarento',w:{money:1},wealth:.01,battleStyle:'aggr'},
+ {name:'Paranóico (segredos)',w:{hid:2,secret:2,f_hid:2,f_secret:2,love:.5,mao:-1},battleStyle:'smart'},
+ {name:'Fiel a Mao',w:{mao:4},battleStyle:'smart'},
+ {name:'Rebelde',w:{mao:-3,unrest:1,love:1},battleStyle:'rand'},
+ {name:'Curioso (maior impacto)',w:{love:1,mao:1,research:1,frag:1,unrest:1,money:.03,infl:.2},noise:2,battleStyle:'smart'},
+ {name:'Cientista',w:{research:4,etica:2},battleStyle:'smart'},
+ {name:'Social-democrata',w:{unrest:-3,infl:.2},battleStyle:'defensive'},
+ {name:'Imprudente',w:{research:3,etica:-3,money:.03},battleStyle:'aggr'},
+ {name:'Emocional',w:{love:3,mao:-1},battleStyle:'rand'},
+ {name:'Cansado (desatento)',style:'random',manageStyle:'random',battleStyle:'last'}
+];
